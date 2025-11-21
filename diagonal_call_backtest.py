@@ -165,6 +165,15 @@ class DiagonalCallStrategy:
             # Roll short call monthly (approximately every 21 trading days)
             monthly_counter += 1
             if monthly_counter >= 21:  # Approximate 1 month
+                # Save the expiring strike before rolling
+                expiring_strike = self.short_call_strike
+
+                # Check if shares should be called away at expiration
+                if self.shares_owned > 0 and expiring_strike:
+                    if current_price >= expiring_strike:
+                        self._shares_called_away(date, current_price, expiring_strike)
+
+                # Now roll the short call
                 self._exit_short_call(date, current_price)
                 self._enter_short_call(date, current_price, initial_price)
                 monthly_counter = 0
@@ -174,11 +183,6 @@ class DiagonalCallStrategy:
                 distance_to_strike = (self.short_call_strike - current_price) / current_price
                 if 0 < distance_to_strike < self.approach_threshold:
                     self._buy_shares(date, current_price)
-
-            # Check if shares get called away (price above strike at month end)
-            if self.shares_owned > 0 and monthly_counter == 0:
-                if current_price >= self.short_call_strike:
-                    self._shares_called_away(date, current_price)
 
             # Calculate daily P&L
             pnl = self._calculate_pnl(date, current_price)
@@ -299,24 +303,24 @@ class DiagonalCallStrategy:
         print(f"  Cost: ${price * 100:.2f}")
         print(f"  Reason: Approaching short call strike ${self.short_call_strike:.2f}")
 
-    def _shares_called_away(self, date: datetime, price: float):
+    def _shares_called_away(self, date: datetime, price: float, strike: float):
         """Shares are called away at strike price"""
         if self.shares_owned == 0:
             return
 
-        profit = (self.short_call_strike - self.share_cost_basis) * self.shares_owned
+        profit = (strike - self.share_cost_basis) * self.shares_owned
 
         self.trades.append({
             'Date': date,
             'Action': 'SHARES_CALLED_AWAY',
             'Shares': self.shares_owned,
-            'Strike': self.short_call_strike,
+            'Strike': strike,
             'Cost_Basis': self.share_cost_basis,
             'Profit': profit
         })
 
         print(f"\n{date.date()} - SHARES CALLED AWAY")
-        print(f"  100 shares @ ${self.short_call_strike:.2f}")
+        print(f"  100 shares @ ${strike:.2f}")
         print(f"  Cost basis: ${self.share_cost_basis:.2f}")
         print(f"  Profit: ${profit:.2f}")
 
