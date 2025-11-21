@@ -19,66 +19,93 @@ The strategy combines:
 - ✅ Comprehensive P&L tracking
 - ✅ Visual performance reports
 - ✅ Detailed trade logs
+- ✅ **Two versions**: Yahoo Finance (free) and Bloomberg API (real data)
 
 ## Installation
 
-### On Mac (Development)
+### Version 1: Yahoo Finance (No Bloomberg Required)
 
+**On Mac:**
 ```bash
-# Create virtual environment
 python3 -m venv venv
 source venv/bin/activate
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### On Windows (Execution with Bloomberg)
+**On Windows:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
 
+### Version 2: Bloomberg API (Requires Bloomberg Terminal)
+
+**On Windows with Bloomberg Terminal:**
 ```bash
 # Create virtual environment
 python -m venv venv
 venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements_bloomberg.txt
+
+# Install Bloomberg API
+pip install --index-url=https://blpapi.bloomberg.com/repository/releases/python/simple/ blpapi
 ```
+
+**Requirements:**
+- Bloomberg Terminal must be installed and running
+- You must be logged into Bloomberg Terminal
+- Terminal runs on `localhost:8194`
 
 ## Usage
 
-### Basic Example
+### Version 1: Yahoo Finance (Free Data)
 
+**Run the example:**
+```bash
+python example.py
+```
+
+**Custom usage:**
 ```python
 from diagonal_call_backtest import DiagonalCallStrategy
 
-# Create strategy instance
 strategy = DiagonalCallStrategy(
-    ticker='AAPL',
+    ticker='AAPL',  # Simple ticker format
     start_date='2023-01-01',
     end_date='2024-11-01',
-    leap_dte=730,           # 2-year LEAP
-    short_call_dte=30,      # Monthly calls
-    volatility=0.30,        # 30% IV
-    otm_pct_up=0.08,        # 8% OTM when market is up
-    otm_pct_down=0.03,      # 3% OTM when market is down
 )
 
-# Run backtest
 results_df, trades_df = strategy.run_backtest()
 ```
 
-### Run the Script
+### Version 2: Bloomberg API (Real Bloomberg Data)
 
+**⚠️ Make sure Bloomberg Terminal is running first!**
+
+**Run the example:**
 ```bash
-python diagonal_call_backtest.py
+python example_bloomberg.py
 ```
 
-This will:
-- Download historical data for AAPL
-- Run the backtest
-- Print summary statistics
-- Generate visualizations
-- Save results to CSV files
+**Custom usage:**
+```python
+from diagonal_call_backtest_bloomberg import DiagonalCallStrategy
+
+strategy = DiagonalCallStrategy(
+    ticker='AAPL US Equity',  # Bloomberg ticker format
+    start_date='2023-01-01',
+    end_date='2024-11-01',
+)
+
+results_df, trades_df = strategy.run_backtest()
+```
+
+**Bloomberg Ticker Format:**
+- US Stocks: `AAPL US Equity`, `MSFT US Equity`
+- ETFs: `SPY US Equity`, `QQQ US Equity`
 
 ## Parameters
 
