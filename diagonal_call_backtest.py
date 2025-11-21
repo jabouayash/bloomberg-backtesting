@@ -431,7 +431,10 @@ def print_summary(results_df: pd.DataFrame, trades_df: pd.DataFrame, ticker: str
     print("BACKTEST SUMMARY")
     print("="*80)
 
-    initial_investment = abs(results_df['LEAP_PnL'].iloc[0])
+    # Get initial LEAP cost from trades log
+    leap_trade = trades_df[trades_df['Action'] == 'BUY_LEAP'].iloc[0]
+    initial_investment = leap_trade['Price']
+
     final_pnl = results_df['PnL'].iloc[-1]
     total_premium = results_df['Cumulative_Premium'].iloc[-1]
 
@@ -440,7 +443,11 @@ def print_summary(results_df: pd.DataFrame, trades_df: pd.DataFrame, ticker: str
     print(f"💰 Initial LEAP Cost: ${initial_investment:.2f}")
     print(f"💵 Total Premium Collected: ${total_premium:.2f}")
     print(f"📊 Final P&L: ${final_pnl:.2f}")
-    print(f"📈 Return: {(final_pnl / initial_investment) * 100:.2f}%")
+
+    if initial_investment > 0:
+        print(f"📈 Return: {(final_pnl / initial_investment) * 100:.2f}%")
+    else:
+        print(f"📈 Return: N/A (no initial investment)")
 
     # Stock performance
     stock_return = ((results_df['Price'].iloc[-1] - results_df['Price'].iloc[0]) /
