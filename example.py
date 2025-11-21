@@ -24,6 +24,11 @@ def run_simple_backtest():
     print_summary(results_df, trades_df, 'AAPL')
     plot_results(results_df, 'AAPL')
 
+    # Save results to CSV
+    results_df.to_csv('backtest_results.csv', index=False)
+    trades_df.to_csv('backtest_trades.csv', index=False)
+    print("\n💾 Results saved to 'backtest_results.csv' and 'backtest_trades.csv'")
+
     return results_df, trades_df
 
 
@@ -51,6 +56,11 @@ def run_custom_backtest():
     # Show results
     print_summary(results_df, trades_df, 'SPY')
     plot_results(results_df, 'SPY')
+
+    # Save results to CSV
+    results_df.to_csv('backtest_results.csv', index=False)
+    trades_df.to_csv('backtest_trades.csv', index=False)
+    print("\n💾 Results saved to 'backtest_results.csv' and 'backtest_trades.csv'")
 
     return results_df, trades_df
 

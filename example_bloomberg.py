@@ -37,6 +37,11 @@ def run_aapl_backtest():
     print_summary(results_df, trades_df, 'AAPL')
     plot_results(results_df, 'AAPL')
 
+    # Save results to CSV
+    results_df.to_csv('backtest_results_bloomberg.csv', index=False)
+    trades_df.to_csv('backtest_trades_bloomberg.csv', index=False)
+    print("\n💾 Results saved to 'backtest_results_bloomberg.csv' and 'backtest_trades_bloomberg.csv'")
+
     return results_df, trades_df
 
 
@@ -61,6 +66,11 @@ def run_custom_ticker():
     results_df, trades_df = strategy.run_backtest()
     print_summary(results_df, trades_df, ticker)
     plot_results(results_df, ticker)
+
+    # Save results to CSV
+    results_df.to_csv('backtest_results_bloomberg.csv', index=False)
+    trades_df.to_csv('backtest_trades_bloomberg.csv', index=False)
+    print("\n💾 Results saved to 'backtest_results_bloomberg.csv' and 'backtest_trades_bloomberg.csv'")
 
     return results_df, trades_df
 
